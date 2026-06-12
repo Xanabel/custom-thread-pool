@@ -3,6 +3,7 @@ package org.example;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public interface CustomExecutor extends Executor {
 
@@ -14,4 +15,6 @@ public interface CustomExecutor extends Executor {
     void shutdown();
 
     void shutdownNow();
+
+    boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException;
 }

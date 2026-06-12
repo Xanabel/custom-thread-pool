@@ -9,6 +9,7 @@ public class Worker implements Runnable {
     private final long keepAliveTime;
     private final TimeUnit timeUnit;
     private final CustomThreadPool pool;
+    private volatile boolean busy = false;
 
     public Worker(
             BlockingQueue<Runnable> queue,
@@ -24,6 +25,10 @@ public class Worker implements Runnable {
 
     public BlockingQueue<Runnable> getQueue() {
         return queue;
+    }
+
+    public boolean isBusy() {
+        return busy;
     }
 
     @Override
@@ -43,18 +48,23 @@ public class Worker implements Runnable {
                 Runnable task = queue.poll(keepAliveTime, timeUnit);
 
                 if (task == null) {
+                    task = pool.stealTask(this);
+                }
+
+                if (task == null) {
                     if (pool.canStopWorkerOnIdle()) {
                         System.out.println("[Worker] " + workerName + " idle timeout, stopping.");
                         break;
                     }
-
                     continue;
                 }
 
                 if (!pool.isShutdownNow()) {
+                    busy = true;
                     System.out.println("[Worker] " + workerName + " executes " + task);
                     task.run();
                     pool.taskCompleted();
+                    busy = false;
                 }
             }
         } catch (InterruptedException e) {

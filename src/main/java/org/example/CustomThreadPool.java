@@ -119,8 +119,20 @@ public class CustomThreadPool implements CustomExecutor {
         }
 
         FutureTask<T> futureTask = new FutureTask<>(callable);
-        execute(futureTask);
 
+        Runnable loggingTask = new Runnable() {
+            @Override
+            public void run() {
+                futureTask.run();
+            }
+
+            @Override
+            public String toString() {
+                return "Callable-" + Integer.toHexString(callable.hashCode());
+            }
+        };
+
+        execute(loggingTask);
         return futureTask;
     }
 
@@ -148,6 +160,22 @@ public class CustomThreadPool implements CustomExecutor {
         }
     }
 
+    @Override
+    public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+        long deadline = System.nanoTime() + unit.toNanos(timeout);
+
+        synchronized (this) {
+            while (!isTerminated()) {
+                long remainingNanos = deadline - System.nanoTime();
+                if (remainingNanos <= 0) {
+                    return isTerminated();
+                }
+                TimeUnit.NANOSECONDS.timedWait(this, remainingNanos);
+            }
+        }
+        return true;
+    }
+
     public boolean isShutdown() {
         return shutdown;
     }
@@ -172,6 +200,8 @@ public class CustomThreadPool implements CustomExecutor {
             queues.remove(index);
             workerThreads.remove(index);
         }
+
+        notifyAll();
     }
 
     public synchronized boolean isTerminated() {
@@ -223,8 +253,8 @@ public class CustomThreadPool implements CustomExecutor {
     private synchronized int countFreeThreads() {
         int free = 0;
 
-        for (BlockingQueue<Runnable> queue : queues) {
-            if (queue.isEmpty()) {
+        for (Worker worker : workers) {
+            if (!worker.isBusy()) {
                 free++;
             }
         }
@@ -240,5 +270,18 @@ public class CustomThreadPool implements CustomExecutor {
     private void reject(Runnable command) {
         rejectedTasks.incrementAndGet();
         rejectedTaskHandler.reject(command);
+    }
+
+    public synchronized Runnable stealTask(Worker thief) {
+        for (BlockingQueue<Runnable> otherQueue : queues) {
+            if (otherQueue == thief.getQueue()) {
+                continue;
+            }
+            Runnable task = otherQueue.poll();
+            if (task != null) {
+                return task;
+            }
+        }
+        return null;
     }
 }
