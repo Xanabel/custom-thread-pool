@@ -30,18 +30,17 @@
 ```
 
 ### Назначение классов
-```
-Класс                           Назначение
-CustomExecutor	                Интерфейс пула потоков
-CustomThreadPool	            Основная реализация пула
-CustomThreadFactory	            Создание и именование потоков
-Worker	                        Рабочий поток
-RejectedTaskHandler	            Интерфейс политики отказа
-AbortRejectedTaskHandler	    Отклонение задачи при перегрузке
-CallerRunsRejectedTaskHandler	Выполнение задачи в вызывающем потоке
-NamedTask	                    Демонстрационная задача
-Main	                        Демонстрационная программа
-```
+| Класс | Назначение |
+|---|---|
+| CustomExecutor | Интерфейс пула потоков |
+| CustomThreadPool | Основная реализация пула |
+| CustomThreadFactory | Создание и именование потоков |
+| Worker | Рабочий поток |
+| RejectedTaskHandler | Интерфейс политики отказа |
+| AbortRejectedTaskHandler | Отклонение задачи при перегрузке |
+| CallerRunsRejectedTaskHandler | Выполнение задачи в вызывающем потоке |
+| NamedTask | Демонстрационная задача |
+| Main | Демонстрационная программа |
 
 ## Настраиваемые параметры
 
