@@ -45,19 +45,24 @@ Main	                        Демонстрационная программа
 
 Пул поддерживает следующие параметры:
 
+```
 corePoolSize
 maxPoolSize
 queueSize
 keepAliveTime
 timeUnit
 minSpareThreads
+```
 
 ### Используемые значения
+
+```
 corePoolSize = 2
 maxPoolSize = 4
 queueSize = 3 (тесты с отказом) / 5 (тест с Callable)
 keepAliveTime = 5 секунд
 minSpareThreads = 1
+```
 
 ## Балансировка нагрузки
 
@@ -134,10 +139,12 @@ Queue0 → Queue1 → Queue2 → Queue3 → Queue0 ...
 
 Пример:
 
+```
 [ThreadFactory] Creating new thread: XanaPool-worker-1
 [Pool] Task accepted into queue #1: Request-5
 [Worker] XanaPool-worker-2 executes Request-5
 [Rejected] Task Request-21 was rejected due to overload!
+```
 
 ## Завершение работы пула
 ### shutdown()
@@ -220,18 +227,22 @@ queueSize = 5
 ## Результаты тестирования
 
 ### Тест 1: Abort Policy
+```
 Accepted tasks: 14
 Rejected tasks: 6
 Completed tasks: 14
 Active workers: 0
 Terminated: true
+```
 
 ### Тест 2: CallerRuns Policy
+```
 Accepted tasks: 18
 Rejected tasks: 2
 Completed tasks: 18
 Active workers: 0
 Terminated: true
+```
 
 При использовании CallerRunsRejectedTaskHandler rejected-задачи
 не теряются — они выполняются в потоке отправителя.
